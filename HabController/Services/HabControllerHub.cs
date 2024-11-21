@@ -42,7 +42,7 @@ namespace HabController.Services
         private void _gpsService_GpsPosition(string message)
         {
             Console.WriteLine(message);
-            Console.WriteLine(message.ToBinary());
+            //Console.WriteLine(message.ToBinary());
 
             _artificationTimeOutCount--;
 
