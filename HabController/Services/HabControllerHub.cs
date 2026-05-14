@@ -1,4 +1,6 @@
 ﻿using HabController.Extensions;
+using HabController.Gps;
+using HabController.Logging;
 using Microsoft.Extensions.Configuration;
 using System;
 using System.Collections.Generic;
@@ -11,6 +13,7 @@ namespace HabController.Services
 {
     public class HabControllerHub
     {
+        private readonly LoggingService _loggingService;
         private readonly GpsService _gpsService;
 
 
@@ -23,8 +26,9 @@ namespace HabController.Services
 
         private int _artificationTimeOutCount = 100;
 
-        public HabControllerHub(IConfiguration config, GpsService gpsService)
+        public HabControllerHub(IConfiguration config, LoggingService loggingService, GpsService gpsService)
         {
+            _loggingService = loggingService;
             _gpsService = gpsService;
 
 

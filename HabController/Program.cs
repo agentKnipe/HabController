@@ -1,4 +1,6 @@
-﻿using HabController.Models.GPS;
+﻿using HabController.Gps;
+using HabController.Logging;
+using HabController.Models.GPS;
 using HabController.Services;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -13,9 +15,9 @@ namespace HabController
         static bool _continue;
         static SerialPort _serialPort;
 
-        private static SatallitesInView _satallitesInView;
-        private static Position _currentPosition;
-        private static SystemFix _systemFix;
+        //private static SatallitesInView _satallitesInView;
+        //private static Position _currentPosition;
+        //private static SystemFix _systemFix;
 
 
         private static IConfiguration _configuration {  get; set; }
@@ -26,6 +28,7 @@ namespace HabController
 
             var serviceProviders = services.BuildServiceProvider();
 
+            /* Start the HabHub */
             serviceProviders.GetService<HabControllerHub>().Run();
         }
 
@@ -37,8 +40,8 @@ namespace HabController
             IServiceCollection services = new ServiceCollection();
 
             services.AddSingleton<IConfiguration>(provider => config);
+            services.AddSingleton<LoggingService>();
             services.AddSingleton<GpsService>();
-
 
             services.AddSingleton<HabControllerHub>();
 

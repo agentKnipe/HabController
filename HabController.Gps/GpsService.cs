@@ -1,10 +1,10 @@
-﻿using HabController.Models;
+﻿using HabController.Logging;
 using HabController.Models.GPS;
 using Microsoft.Extensions.Configuration;
 using System.IO.Ports;
 using System.Timers;
 
-namespace HabController.Services
+namespace HabController.Gps
 {
     public class GpsService
     {
@@ -24,8 +24,8 @@ namespace HabController.Services
         private FixStatusEnum _currentFixStatus;
 
         private LoggingService _loggingService;
-        private string _logDirectory;
-        private string _logFileName;
+        //private string _logDirectory;
+        //private string _logFileName;
 
         public delegate void GpsPositionEventHandler(string message);
         public delegate void GpsFixTypeChangedEventHandler(FixTypeEnum fixType, int satCount);
@@ -46,25 +46,25 @@ namespace HabController.Services
 
 
 
-        public GpsService(IConfiguration config)
+        public GpsService(LoggingService loggingService, IConfiguration config)
         {
             _serialPort = new SerialPort(config.GetValue<string>("Gps:SerialPort"), config.GetValue<int>("Gps:BaudRate"));
             //TODO: Move this to the AppSettings.json?
-            _serialPort.Parity = Parity.None;
-            _serialPort.StopBits = StopBits.One;
-            _serialPort.DataBits = 8;
-            _serialPort.Handshake = Handshake.None;
-            _serialPort.ReadTimeout = 1000;
-            _serialPort.DtrEnable = true;
+            _serialPort.Parity = (Parity)config.GetValue<int>("Gps:Parity");
+            _serialPort.StopBits = (StopBits)config.GetValue<int>("Gps:StopBits");
+            _serialPort.DataBits = config.GetValue<int>("Gps:DataBits");
+            _serialPort.Handshake = (Handshake)config.GetValue<int>("Gps:HandShake");
+            _serialPort.ReadTimeout = config.GetValue<int>("Gps:ReadTimeout");
+            _serialPort.DtrEnable = config.GetValue<bool>("Gps:DtrEnabled");
 
             _systemFix = new SystemFix();
             _satallitesInView = new SatallitesInView();
             _currentPosition = new Position();
 
-            _logDirectory = config.GetValue<string>("Gps:LogFilePath");
-            _logFileName = string.Format(config.GetValue<string>("Gps:LogFileName"), DateTime.Now.ToString("yyyyMMdd"));
+            //_logDirectory = config.GetValue<string>("Gps:LogFilePath");
+            //_logFileName = string.Format(config.GetValue<string>("Gps:LogFileName"), DateTime.Now.ToString("yyyyMMdd"));
 
-            _loggingService = new LoggingService(_logDirectory, _logFileName);
+            _loggingService = loggingService;
         }
 
         public void Start()
@@ -98,7 +98,7 @@ namespace HabController.Services
         {
             if (!_reportTimerStarted)
             {
-                _reportTimer = new System.Timers.Timer(10000); //10 secondsts
+                _reportTimer = new System.Timers.Timer(10000); //10 seconds
                 _reportTimer.Elapsed += OnReportTimedEvent;
                 _reportTimer.AutoReset = true;
                 _reportTimer.Enabled = true;

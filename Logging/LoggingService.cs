@@ -1,10 +1,7 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿
+using Microsoft.Extensions.Configuration;
 
-namespace HabController.Services
+namespace HabController.Logging
 {
     public class LoggingService
     {
@@ -19,10 +16,11 @@ namespace HabController.Services
             }
         }
 
-        public LoggingService(string directory, string fileName)
+        public LoggingService(IConfiguration config)
         {
-            _directory = directory;
-            _fileName = fileName;
+
+            _directory = config.GetValue<string>("Logging:Directory");
+            _fileName = config.GetValue<string>("Logging:FileName"); 
 
             ValidateDirectory();
         }
